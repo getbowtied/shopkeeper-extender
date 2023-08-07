@@ -137,6 +137,9 @@ Start your journey to success today and elevate your online store to the next le
 
 == Changelog ==
 
+= 2.9 =
+- Small maintenance updates
+
 = 2.8 =
 - Recheck Compatibility with WordPress 6.2.2
 - Recheck Compatibility with WooCommerce 7.9.0
