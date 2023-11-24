@@ -39,8 +39,14 @@ function sk_ext_is_topbar_enabled(){
 }
 
 // Other Plugins
-
 function gbt_other_plugins_enqueue_scripts() {
    wp_enqueue_script( 'gbt-other-plugins', plugins_url( 'js/other_plugins.js', __FILE__ ), array('jquery') );
 }
 add_action( 'admin_enqueue_scripts', 'gbt_other_plugins_enqueue_scripts' );
+
+// Admin Notices
+function shopkeeper_extender_admin_notices_enqueue_scripts() {
+   wp_enqueue_script( 'shopkeeper-extender-admin-notices-js', plugins_url( 'js/admin_notices.js', __FILE__ ), array('jquery') );
+   wp_enqueue_style( 'shopkeeper-extender-admin-notices-css', plugins_url( 'css/admin_notices.css', __FILE__ ) );
+}
+add_action( 'admin_enqueue_scripts', 'shopkeeper_extender_admin_notices_enqueue_scripts' );
