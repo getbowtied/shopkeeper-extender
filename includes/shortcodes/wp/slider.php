@@ -136,12 +136,12 @@ function sk_image_slide_shortcode($params = array(), $content = null) {
 
 	$getbowtied_image_slide = '
 			<div class="swiper-slide '.$class.'"
-			style=	"background: '.$bg_color.' url('.$bg_image.') center center no-repeat ;
+			style=	"background: '.esc_attr($bg_color).' url('.$bg_image.') center center no-repeat ;
 					-webkit-background-size: cover;
 					-moz-background-size: cover;
 					-o-background-size: cover;
 					background-size: cover;
-					color: '.$text_color.'">
+					color: '.esc_attr($text_color).'">
 				'.$slide_link.'
 				<div class="slider-content" data-swiper-parallax="-50%">
 					<div class="slider-content-wrapper">
