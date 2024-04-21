@@ -21,7 +21,7 @@ function sk_slider_shortcode($params = array(), $content = null) {
 
 	if ($full_height == 'no' && !empty($custom_height))
 	{
-		$height = 'height:'.$custom_height.';';
+		$height = 'height:'.esc_attr($custom_height).';';
 		$extra_class = '';
 	}
 	else
@@ -30,21 +30,21 @@ function sk_slider_shortcode($params = array(), $content = null) {
 		$extra_class = 'full_height';
 	}
 
-	$bottom_line = '<style>.shortcode_getbowtied_slider .shortcode-slider-pagination .swiper-pagination-bullet.swiper-pagination-bullet-active:after{background-color: '. $color_navigation_bullets . ';}</style>';
+	$bottom_line = '<style>.shortcode_getbowtied_slider .shortcode-slider-pagination .swiper-pagination-bullet.swiper-pagination-bullet-active:after{background-color: '. esc_attr($color_navigation_bullets) . ';}</style>';
 
 	$unique = uniqid();
 
 	$getbowtied_slider = $bottom_line . '
 
-		<div class="shortcode_getbowtied_slider swiper-container swiper-'.esc_attr($unique).' '.$extra_class.'" style="'.$height.' width: 100%" data-autoplay="'.$custom_autoplay_speed.'" data-id="'.esc_attr($unique).'">
+		<div class="shortcode_getbowtied_slider swiper-container swiper-'.esc_attr($unique).' '.$extra_class.'" style="'.esc_attr($height).' width: 100%" data-autoplay="'.esc_attr($custom_autoplay_speed).'" data-id="'.esc_attr($unique).'">
 			<div class="swiper-wrapper">
 			'.do_shortcode($content).'
 			</div>';
 
 	if (!$hide_arrows):
 			$getbowtied_slider .= '
-				<div style="color: '. $color_navigation_arrows .'" class="swiper-button-prev"><i class="spk-icon spk-icon-left-arrow-thin-large"></i></div>
-    			<div style="color: '. $color_navigation_arrows .'" class="swiper-button-next"><i class="spk-icon spk-icon-right-arrow-thin-large"></i></div>';
+				<div style="color: '. esc_attr($color_navigation_arrows) .'" class="swiper-button-prev"><i class="spk-icon spk-icon-left-arrow-thin-large"></i></div>
+    			<div style="color: '. esc_attr($color_navigation_arrows) .'" class="swiper-button-next"><i class="spk-icon spk-icon-right-arrow-thin-large"></i></div>';
     endif;
 
     if (!$hide_bullets):
@@ -96,8 +96,8 @@ function sk_image_slide_shortcode($params = array(), $content = null) {
 
 	if (!empty($title))
 	{
-		$title_line_height = $title_line_height ? $title_line_height : $title_font_size;
-		$title = '<h2 class="'.$title_font_family.'" style="color:'.$text_color.'; font-size:'.$title_font_size.'; line-height: '.$title_line_height.'">'.$title.'</h2>';
+		$title_line_height = $title_line_height ? esc_attr($title_line_height) : esc_attr($title_font_size);
+		$title = wp_kses_post('<h2 class="'.esc_attr($title_font_family).'" style="color:'.esc_attr($text_color).'; font-size:'.esc_attr($title_font_size).'; line-height: '.esc_attr($title_line_height).'">'.esc_html($title).'</h2>');
 	} else {
 		$title = "";
 	}
@@ -111,22 +111,22 @@ function sk_image_slide_shortcode($params = array(), $content = null) {
 
 	if (!empty($description))
 	{
-		$description_line_height = $description_line_height ? $description_line_height : $description_font_size;
-		$description = '<p class="'.$description_font_family.'" style="color:'.$text_color.'; font-size:'.$description_font_size.'; line-height: '.$description_line_height.'">'.$description.'</p>';
+		$description_line_height = $description_line_height ? esc_attr($description_line_height) : esc_attr($description_font_size);
+		$description = wp_kses_post('<p class="'.esc_attr($description_font_family).'" style="color:'.esc_attr($text_color).'; font-size:'.esc_attr($description_font_size).'; line-height: '.esc_attr($description_line_height).'">'.esc_html($description).'</p>');
 	} else {
 		$description = "";
 	}
 
 	if (!empty($button_text))
 	{
-		$button = '<a class="button" style="color:'.$button_text_color.' !important; background: '.$button_color.' !important" href="'.$button_url.'">'.$button_text.'</a>';
+		$button = wp_kses_post('<a class="button" style="color:'.esc_attr($button_text_color).' !important; background: '.esc_attr($button_color).' !important" href="'.esc_url($button_url).'">'.esc_html($button_text).'</a>');
 	} else {
 		$button = "";
 	}
 
 	if ($link_whole_slide && !empty($button_url))
 	{
-		$slide_link = '<a href="'.$button_url.'" class="fullslidelink"></a>';
+		$slide_link = '<a href="'.esc_url($button_url).'" class="fullslidelink"></a>';
 	}
 	else
 	{
@@ -135,14 +135,14 @@ function sk_image_slide_shortcode($params = array(), $content = null) {
 
 
 	$getbowtied_image_slide = '
-			<div class="swiper-slide '.$class.'"
+			<div class="swiper-slide '.esc_attr($class).'"
 			style=	"background: '.esc_attr($bg_color).' url('.$bg_image.') center center no-repeat ;
 					-webkit-background-size: cover;
 					-moz-background-size: cover;
 					-o-background-size: cover;
 					background-size: cover;
 					color: '.esc_attr($text_color).'">
-				'.$slide_link.'
+				'.esc_url($slide_link).'
 				<div class="slider-content" data-swiper-parallax="-50%">
 					<div class="slider-content-wrapper">
 						'.wp_kses_post($title).'
