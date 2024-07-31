@@ -1,9 +1,9 @@
 === Shopkeeper Extender ===
 Contributors: getbowtied
-Tags: shopkeeper, wordpress, woocommerce, theme
+Tags: shopkeeper, woocommerce, theme
 Requires at least: 6.0
-Tested up to: 6.4
-Stable tag: 3.7
+Tested up to: 6.6
+Stable tag: 3.8
 Requires PHP: 7.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -136,6 +136,10 @@ Start your journey to success today and elevate your online store to the next le
 [Shopkeeper Demo](https://shopkeeper.wp-theme.design/)
 
 == Changelog ==
+
+= 3.8 =
+- Recheck Compatibility with WordPress 6.6.1
+- Recheck Compatibility with WooCommerce 9.1.4
 
 = 3.7 =
 - Fix vulnerability issue with [image_slide] shortcode round 2
