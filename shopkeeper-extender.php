@@ -4,13 +4,13 @@
  * Plugin Name:       		Shopkeeper Extender
  * Plugin URI:        		https://shopkeeper.wp-theme.design/
  * Description:       		Extends the functionality of Shopkeeper with theme specific features.
- * Version:           		4.0
+ * Version:           		4.1
  * Author:            		Get Bowtied
  * Author URI:				https://getbowtied.com
  * Text Domain:				shopkeeper-extender
  * Domain Path:				/languages/
  * Requires at least: 		6.0
- * Tested up to: 			6.7
+ * Tested up to: 			6.7.1
  *
  * @package  Shopkeeper Extender
  * @author   GetBowtied
@@ -19,15 +19,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 } // Exit if accessed directly
-
-if ( ! function_exists( 'is_plugin_active' ) ) {
-    require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-}
-
-define( 'SK_EXT_ENQUEUE_SUFFIX', SCRIPT_DEBUG ? '' : '.min' );
-
-$version = ( isset(get_plugin_data( __FILE__ )['Version']) && !empty(get_plugin_data( __FILE__ )['Version']) ) ? get_plugin_data( __FILE__ )['Version'] : '1.0';
-define ( 'SK_EXT_VERSION', $version );
 
 if ( ! class_exists( 'ShopkeeperExtender' ) ) :
 
@@ -44,6 +35,15 @@ if ( ! class_exists( 'ShopkeeperExtender' ) ) :
 			if (self::$initialized) {
 				return;
 			}
+
+			if ( ! function_exists( 'is_plugin_active' ) ) {
+				require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+			}
+			
+			define( 'SK_EXT_ENQUEUE_SUFFIX', SCRIPT_DEBUG ? '' : '.min' );
+			
+			$version = ( isset(get_plugin_data( __FILE__ )['Version']) && !empty(get_plugin_data( __FILE__ )['Version']) ) ? get_plugin_data( __FILE__ )['Version'] : '1.0';
+			define ( 'SK_EXT_VERSION', $version );
 
 			$this->theme_slug = 'shopkeeper';
 
