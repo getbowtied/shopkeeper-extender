@@ -7,14 +7,15 @@ jobs:
     name: New release
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
+    - name: Checkout code with submodules
       uses: actions/checkout@v3
       with:
         submodules: true # Initialize and fetch submodules
+        token: ${{ secrets.SUBMODULE_ACCESS_TOKEN }} # Use the PAT for authentication
 
-    - name: Populate dashboard submodule
+    - name: Populate all submodules
       run: |
-        # Ensure the 'dashboard' submodule is fully updated
+        # Ensure all submodules (dashboard, etc.) are fully updated
         git submodule update --init --recursive
 
     - name: Copy dashboard submodule files
