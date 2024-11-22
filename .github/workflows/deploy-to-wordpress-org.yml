@@ -10,18 +10,13 @@ jobs:
     - name: Checkout code with submodules
       uses: actions/checkout@v3
       with:
-        submodules: true # Initialize and fetch submodules
-        token: ${{ secrets.SUBMODULE_ACCESS_TOKEN }} # Use the PAT for authentication
+        submodules: true
+        token: ${{ secrets.SUBMODULE_ACCESS_TOKEN }}
 
-    - name: Populate all submodules
+    - name: Initialize and update submodules
       run: |
         # Ensure all submodules (dashboard, etc.) are fully updated
         git submodule update --init --recursive
-
-    - name: Copy dashboard submodule files
-      run: |
-        # Ensure the dashboard folder has all its contents
-        cp -r dashboard/* .
 
     - name: WordPress Plugin Deploy
       uses: 10up/action-wordpress-plugin-deploy@stable
