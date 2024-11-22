@@ -8,7 +8,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@master
+      uses: actions/checkout@v3
+      with:
+        submodules: true # Initialize and fetch submodules
+
+    - name: Populate dashboard submodule
+      run: |
+        # Ensure the 'dashboard' submodule is fully updated
+        git submodule update --init --recursive
+
+    - name: Copy dashboard submodule files
+      run: |
+        # Ensure the dashboard folder has all its contents
+        cp -r dashboard/* .
+
     - name: WordPress Plugin Deploy
       uses: 10up/action-wordpress-plugin-deploy@stable
       with:
