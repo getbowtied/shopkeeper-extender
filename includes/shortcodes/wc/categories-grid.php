@@ -129,7 +129,7 @@ function sk_product_categories_shortcode( $atts ) {
 
 	woocommerce_reset_loop();
 
-	return '<div class="row"><div class="categories_grid">' . ob_get_clean() . '</div></div>';
+	return '<div class="categories_grid">' . ob_get_clean() . '</div>';
 }
 
 add_shortcode("product_categories_grid", "sk_product_categories_shortcode");
