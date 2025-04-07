@@ -1,7 +1,7 @@
 {
 	"name": "Shopkeeper Extender",
-	"version": "5.1",
-	"download_url": "https://downloads.wordpress.org/plugin/shopkeeper-extender.5.1.zip",
+	"version": "5.1.1",
+	"download_url": "https://downloads.wordpress.org/plugin/shopkeeper-extender.5.1.1.zip",
 
 	"homepage": "https://wordpress.org/plugins/shopkeeper-extender/",
 	"requires": "6.0",
