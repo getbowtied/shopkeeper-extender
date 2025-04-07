@@ -137,7 +137,7 @@ Start your journey to success today and elevate your online store to the next le
 
 == Changelog ==
 
-= 5.0 =
+= 5.1 =
 - Maintenance update
 
 = 4.7 =
