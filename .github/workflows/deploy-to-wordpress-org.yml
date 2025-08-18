@@ -7,17 +7,8 @@ jobs:
     name: New release
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code with submodules
-      uses: actions/checkout@v3
-      with:
-        submodules: true
-        token: ${{ secrets.SUBMODULE_ACCESS_TOKEN }}
-
-    - name: Initialize and update submodules
-      run: |
-        # Ensure all submodules (dashboard, etc.) are fully updated
-        git submodule update --init --recursive
-
+    - name: Checkout code
+      uses: actions/checkout@master
     - name: WordPress Plugin Deploy
       uses: 10up/action-wordpress-plugin-deploy@stable
       with:
