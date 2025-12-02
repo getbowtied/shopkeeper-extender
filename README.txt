@@ -2,7 +2,7 @@
 Contributors: getbowtied
 Tags: shopkeeper, woocommerce, theme
 Requires at least: 6.0
-Tested up to: 6.8
+Tested up to: 6.9
 Stable tag: 7.1
 Requires PHP: 7.4.1
 License: GPLv2 or later
