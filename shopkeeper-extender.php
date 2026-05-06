@@ -83,14 +83,6 @@ if ( ! class_exists( 'ShopkeeperExtender' ) ) :
 
 			}
 
-			if ( is_admin() || ( defined('WP_CLI') && WP_CLI ) ) {
-				global $gbt_dashboard_params;
-				$gbt_dashboard_params = array(
-					'gbt_theme_slug' => $this->theme_slug,
-				);
-				include_once( dirname( __FILE__ ) . '/dashboard/index.php' );
-			}
-
 			self::$initialized = true;
 		}
 
