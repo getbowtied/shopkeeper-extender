@@ -3,7 +3,7 @@ Contributors: getbowtied
 Tags: shopkeeper, woocommerce, theme
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 7.3
+Stable tag: 7.5
 Requires PHP: 7.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -142,9 +142,12 @@ Experience the difference that Shopkeeper can make for your online store and sta
 
 Start your journey to success today and elevate your online store to the next level with Shopkeeper!
 
-[Shopkeeper Demo](https://shopkeeper.wp-theme.design/)
+[Shopkeeper Demo](https://shopkeeper.getbowtied.com)
 
 == Changelog ==
+
+= 7.5 =
+- Maintenance: Data Sanitization/Escaping
 
 = 7.3 =
 - Update Compatibility with WordPress 6.9.4
@@ -251,7 +254,7 @@ Start your journey to success today and elevate your online store to the next le
 - Small maintenance updates
 
 = 2.3 =
-- New: If the [Shopkeeper Theme](https://shopkeeper.wp-theme.design/) is not activated, a notification is displayed in the dashboard.
+- New: If the [Shopkeeper Theme](https://shopkeeper.getbowtied.com) is not activated, a notification is displayed in the dashboard.
 
 = 2.2 =
 - Removed: WordPress Blocks are deprecated.
