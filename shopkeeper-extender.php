@@ -20,14 +20,6 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-require 'dashboard/inc/puc/plugin-update-checker.php';
-use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
-$plugin_update_checker = PucFactory::buildUpdateChecker(
-	'https://raw.githubusercontent.com/getbowtied/shopkeeper-extender/master/core/updater/assets/plugin.json',
-	__FILE__,
-	'shopkeeper-extender'
-);
-
 if ( ! class_exists( 'ShopkeeperExtender' ) ) :
 
 	class ShopkeeperExtender {
