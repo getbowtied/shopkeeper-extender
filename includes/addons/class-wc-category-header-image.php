@@ -65,12 +65,12 @@ if ( ! class_exists( 'SKCategoryHeaderImage' ) ) :
 			?>
 
 			<div class="form-field">
-				<label><?php _e( 'Header', 'shopkeeper-extender' ); ?></label>
-				<div id="product_cat_header" style="float:left;margin-right:10px;"><img src="<?php echo wc_placeholder_img_src(); ?>" width="60px" height="60px" /></div>
+				<label><?php esc_html_e( 'Header', 'shopkeeper-extender' ); ?></label>
+				<div id="product_cat_header" style="float:left;margin-right:10px;"><img src="<?php echo esc_url( wc_placeholder_img_src() ); ?>" width="60px" height="60px" /></div>
 				<div style="line-height:60px;">
 					<input type="hidden" id="product_cat_header_id" name="product_cat_header_id" />
-					<button type="submit" class="upload_header_button button"><?php _e( 'Upload/Add image', 'shopkeeper-extender' ); ?></button>
-					<button type="submit" class="remove_header_image_button button"><?php _e( 'Remove image', 'shopkeeper-extender' ); ?></button>
+					<button type="submit" class="upload_header_button button"><?php esc_html_e( 'Upload/Add image', 'shopkeeper-extender' ); ?></button>
+					<button type="submit" class="remove_header_image_button button"><?php esc_html_e( 'Remove image', 'shopkeeper-extender' ); ?></button>
 				</div>
 
 				<script type="text/javascript">
@@ -94,9 +94,9 @@ if ( ! class_exists( 'SKCategoryHeaderImage' ) ) :
 
 						// Create the media frame.
 						header_file_frame = wp.media.frames.downloadable_file = wp.media({
-							title: '<?php _e( 'Choose an image', 'shopkeeper-extender' ); ?>',
+							title: <?php echo wp_json_encode( __( 'Choose an image', 'shopkeeper-extender' ) ); ?>,
 							button: {
-								text: '<?php _e( 'Use image', 'shopkeeper-extender' ); ?>',
+								text: <?php echo wp_json_encode( __( 'Use image', 'shopkeeper-extender' ) ); ?>,
 							},
 							multiple: false
 						});
@@ -115,7 +115,7 @@ if ( ! class_exists( 'SKCategoryHeaderImage' ) ) :
 					});
 
 					jQuery(document).on( 'click', '.remove_header_image_button', function( event ){
-						jQuery('#product_cat_header img').attr('src', '<?php echo wc_placeholder_img_src(); ?>');
+						jQuery('#product_cat_header img').attr('src', <?php echo wp_json_encode( wc_placeholder_img_src() ); ?>);
 						jQuery('#product_cat_header_id').val('');
 						jQuery('.remove_header_image_button').hide();
 						return false;
@@ -155,13 +155,13 @@ if ( ! class_exists( 'SKCategoryHeaderImage' ) ) :
 			?>
 
 			<tr class="form-field">
-				<th scope="row" valign="top"><label><?php _e( 'Header', 'shopkeeper-extender' ); ?></label></th>
+				<th scope="row" valign="top"><label><?php esc_html_e( 'Header', 'shopkeeper-extender' ); ?></label></th>
 				<td>
 					<div id="product_cat_header" style="float:left;margin-right:10px;"><img src="<?php echo esc_url($image); ?>" width="60px" height="60px" /></div>
 					<div style="line-height:60px;">
 						<input type="hidden" id="product_cat_header_id" name="product_cat_header_id" value="<?php echo esc_attr($header_id); ?>" />
-						<button type="submit" class="upload_header_button button"><?php _e( 'Upload/Add image', 'shopkeeper-extender' ); ?></button>
-						<button type="submit" class="remove_header_image_button button"><?php _e( 'Remove image', 'shopkeeper-extender' ); ?></button>
+						<button type="submit" class="upload_header_button button"><?php esc_html_e( 'Upload/Add image', 'shopkeeper-extender' ); ?></button>
+						<button type="submit" class="remove_header_image_button button"><?php esc_html_e( 'Remove image', 'shopkeeper-extender' ); ?></button>
 					</div>
 
 					<script type="text/javascript">			 
@@ -187,9 +187,9 @@ if ( ! class_exists( 'SKCategoryHeaderImage' ) ) :
 
 							// Create the media frame.
 							header_file_frame = wp.media.frames.downloadable_file = wp.media({
-								title: '<?php _e( 'Choose an image', 'shopkeeper-extender' ); ?>',
+								title: <?php echo wp_json_encode( __( 'Choose an image', 'shopkeeper-extender' ) ); ?>,
 								button: {
-									text: '<?php _e( 'Use image', 'shopkeeper-extender' ); ?>',
+									text: <?php echo wp_json_encode( __( 'Use image', 'shopkeeper-extender' ) ); ?>,
 								},
 								multiple: false
 							});
@@ -207,7 +207,7 @@ if ( ! class_exists( 'SKCategoryHeaderImage' ) ) :
 						});
 
 						jQuery(document).on( 'click', '.remove_header_image_button', function( event ){
-							jQuery('#product_cat_header img').attr('src', '<?php echo wc_placeholder_img_src(); ?>');
+							jQuery('#product_cat_header img').attr('src', <?php echo wp_json_encode( wc_placeholder_img_src() ); ?>);
 							jQuery('#product_cat_header_id').val('');
 							jQuery('.remove_header_image_button').hide();
 							return false;
@@ -283,7 +283,7 @@ if ( ! class_exists( 'SKCategoryHeaderImage' ) ) :
 				else
 					$image = wc_placeholder_img_src();
 
-				$columns .= '<img src="' . $image . '" alt="Thumbnail" class="wp-post-image" height="48" width="48" />';
+				$columns .= '<img src="' . esc_url( $image ) . '" alt="' . esc_attr__( 'Thumbnail', 'shopkeeper-extender' ) . '" class="wp-post-image" height="48" width="48" />';
 
 			}
 
@@ -299,7 +299,9 @@ if ( ! class_exists( 'SKCategoryHeaderImage' ) ) :
 		 */
 		public function show_category_header() {
 			$category_header_src = $this->woocommerce_get_header_image_url();	
-			echo ($category_header_src!="") ? '<div class="woocommerce_category_header_image"><img src="'.$category_header_src.'" style="width:100%; height:auto; margin:0 0 20px 0" /></div>' : "";
+			echo ( '' !== $category_header_src )
+				? '<div class="woocommerce_category_header_image"><img src="' . esc_url( $category_header_src ) . '" style="width:100%; height:auto; margin:0 0 20px 0" alt="" /></div>'
+				: '';
 		}
 
 		/**
