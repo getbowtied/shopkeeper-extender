@@ -1,4 +1,7 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Add Thumbnail URL attribute to WordPress menus.
  */

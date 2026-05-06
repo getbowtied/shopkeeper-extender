@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 // [from_the_blog]
 function sk_posts_slider_shortcode($atts, $content = null) {
 

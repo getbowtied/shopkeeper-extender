@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * SK_Social_Media_Widget class.
  *

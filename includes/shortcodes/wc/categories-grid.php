@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 function sk_product_categories_shortcode( $atts ) {
 
 	wp_enqueue_style(  'shopkeeper-categories-grid-shortcode-styles' );
