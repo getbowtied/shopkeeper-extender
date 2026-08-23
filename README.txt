@@ -150,14 +150,6 @@ Start your journey to success today and elevate your online store to the next le
 - Update Compatibility with WordPress 7.1.0
 - Update Compatibility with WooCommerce 11.0.1
 
-= 7.9 =
-- Update Compatibility with WordPress 7.1.0
-- Update Compatibility with WooCommerce 11.0.1
-
-= 7.8 =
-- Update Compatibility with WordPress 7.1.0
-- Update Compatibility with WooCommerce 11.0.1
-
 = 7.7 =
 - Update Compatibility with WooCommerce 10.8.1
 
