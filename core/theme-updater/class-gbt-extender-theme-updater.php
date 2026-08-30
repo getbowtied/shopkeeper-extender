@@ -237,17 +237,17 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 						<?php if ( ! $auto_on ) : ?>
 							<span
 								class="gbt-extender-auto-update-wrap"
-								data-enabling-text="<?php echo esc_attr__( 'Enabling auto-updates…', 'the-retailer-extender' ); ?>"
-								data-success-text="<?php echo esc_attr__( 'Auto-updates are enabled.', 'the-retailer-extender' ); ?>"
+								data-enabling-text="<?php echo esc_attr__( 'Enabling auto-updates…', 'shopkeeper-extender' ); ?>"
+								data-success-text="<?php echo esc_attr__( 'Auto-updates are enabled.', 'shopkeeper-extender' ); ?>"
 							>
 								<?php
-								echo esc_html__( 'You may also', 'the-retailer-extender' ) . ' ';
+								echo esc_html__( 'You may also', 'shopkeeper-extender' ) . ' ';
 								printf(
 									'<a href="#" class="gbt-extender-enable-auto-updates" data-theme="%1$s"><strong>%2$s</strong></a>',
 									esc_attr( $slug ),
-									esc_html__( 'enable automatic updates', 'the-retailer-extender' )
+									esc_html__( 'enable automatic updates', 'shopkeeper-extender' )
 								);
-								echo ' ' . esc_html__( "so you won't be bothered again.", 'the-retailer-extender' );
+								echo ' ' . esc_html__( "so you won't be bothered again.", 'shopkeeper-extender' );
 								?>
 							</span>
 						<?php endif; ?>
