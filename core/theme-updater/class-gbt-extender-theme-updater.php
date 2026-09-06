@@ -14,9 +14,8 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 	class GBT_Extender_Theme_Updater {
 
 		/**
-		 * Marker file relative to the parent theme root.
-		 * Present on current GetBowtied themes; alone does not mean “theme owns updates”
-		 * if legacy class-theme-updates.php is still shipped (see theme_has_builtin_updater).
+		 * Marker file for current GetBowtied dashboards (GBT_Theme_Update_Notice).
+		 * Used only when that class is not loaded (front-end / cron).
 		 */
 		const THEME_UPDATER_MARKER = 'dashboard/inc/classes/class-theme-update-notice.php';
 
@@ -52,7 +51,7 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 
 		public static function init(): void {
 			/*
-			 * This file is often loaded from ShopkeeperExtender during after_setup_theme.
+			 * Companion plugins may require this file during after_setup_theme.
 			 * Re-hooking after_setup_theme can miss the current run — register immediately
 			 * when that hook has already started, and always reinforce on init.
 			 */
@@ -72,7 +71,7 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 				return;
 			}
 
-			// Current themes ship this file — leave updates to the theme / Freemius.
+			// Current themes load GBT_Theme_Update_Notice — leave updates to the theme.
 			if ( self::theme_has_builtin_updater() ) {
 				return;
 			}
@@ -109,15 +108,29 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 		/**
 		 * True when the active parent theme should own updates without the extender.
 		 *
-		 * The marker file alone is not enough: some 8.x installs ship
-		 * class-theme-update-notice.php while still running license-gated
-		 * GBT_Theme_Updates (blocked://). Those must be treated as old themes.
-		 *
-		 * - No marker → old → extender owns
-		 * - Marker + legacy class-theme-updates.php → transitional → extender owns
-		 * - Marker without legacy file → current → theme owns
+		 * Admin: trust live class (dashboard is loaded there).
+		 * Front/cron: dashboard is not loaded — infer from files so current themes
+		 * are not taken over during update checks outside admin.
 		 */
 		private static function theme_has_builtin_updater(): bool {
+			if ( class_exists( 'GBT_Theme_Update_Notice', false ) ) {
+				return true;
+			}
+
+			// In admin (or WP-CLI), the dashboard would have loaded the notice class
+			// if this were a current theme. Absence means extender may own.
+			if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+				return false;
+			}
+
+			return self::current_theme_files_indicate_builtin();
+		}
+
+		/**
+		 * Front/cron fallback when dashboard classes are not loaded.
+		 * Marker without legacy class-theme-updates.php = current theme package.
+		 */
+		private static function current_theme_files_indicate_builtin(): bool {
 			if ( ! function_exists( 'get_template_directory' ) ) {
 				return false;
 			}
@@ -128,17 +141,14 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 				return false;
 			}
 
-			$base   = trailingslashit( $theme_dir );
-			$marker = $base . self::THEME_UPDATER_MARKER;
+			$base = trailingslashit( $theme_dir );
 
-			if ( ! file_exists( $marker ) ) {
+			if ( ! file_exists( $base . self::THEME_UPDATER_MARKER ) ) {
 				return false;
 			}
 
-			$legacy = $base . 'dashboard/inc/classes/class-theme-updates.php';
-
-			// Marker + legacy updater file = still on the license-gated path.
-			if ( file_exists( $legacy ) ) {
+			// Transitional installs may ship the marker alongside legacy updates.
+			if ( file_exists( $base . 'dashboard/inc/classes/class-theme-updates.php' ) ) {
 				return false;
 			}
 
@@ -175,7 +185,7 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 				$transient->response = array();
 			}
 
-			// Old themes only (no marker): always own this slug's update entry —
+			// When this fallback owns updates, always own this slug's entry —
 			// overwrite blocked:// and license-gated packages from GBT_Theme_Updates.
 			$transient->response[ $slug ] = $update;
 
