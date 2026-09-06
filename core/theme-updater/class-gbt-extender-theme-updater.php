@@ -4,14 +4,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
+if ( ! class_exists( 'GBT_Extender_Theme_Updater_Core' ) ) {
 
 	/**
 	 * Fallback theme updater for GetBowtied companion plugins.
 	 * Detects the active theme slug from get_template().
 	 * Active only when that theme does not ship its own updater.
+	 *
+	 * Named *_Core so it can load even when an older companion already defined
+	 * the legacy GBT_Extender_Theme_Updater class (hooks detached by loader).
 	 */
-	class GBT_Extender_Theme_Updater {
+	class GBT_Extender_Theme_Updater_Core {
 
 		/**
 		 * Marker file for current GetBowtied dashboards (GBT_Theme_Update_Notice).
@@ -35,6 +38,9 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 		const AUTO_UPDATE_NONCE_ACTION = 'gbt_extender_enable_theme_auto_updates';
 
 		/** @var bool */
+		private static $booted = false;
+
+		/** @var bool */
 		private static $fallback_registered = false;
 		private static $file_config = null;
 
@@ -50,6 +56,11 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 		);
 
 		public static function init(): void {
+			if ( self::$booted ) {
+				return;
+			}
+			self::$booted = true;
+
 			/*
 			 * Companion plugins may require this file during after_setup_theme.
 			 * Re-hooking after_setup_theme can miss the current run — register immediately
@@ -734,6 +745,6 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 		}
 	}
 
-	GBT_Extender_Theme_Updater::init();
+	GBT_Extender_Theme_Updater_Core::init();
 }
 

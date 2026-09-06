@@ -4,7 +4,7 @@
  * Plugin Name:       		Shopkeeper Extender
  * Plugin URI:        		https://shopkeeper.getbowtied.com
  * Description:       		Extends the functionality of Shopkeeper with theme specific features.
- * Version:           		10.0.5
+ * Version:           		10.0.6
  * Author:            		Get Bowtied
  * Author URI:				https://getbowtied.com
  * License:					GPL v2 or later
@@ -106,8 +106,8 @@ if ( ! class_exists( 'ShopkeeperExtender' ) ) :
 
 endif;
 
-// Theme updater must load before after_setup_theme so it can register cleanly.
-require_once dirname( __FILE__ ) . '/core/theme-updater/class-gbt-extender-theme-updater.php';
+// Theme updater: newest library version among active companions wins on plugins_loaded.
+require_once dirname( __FILE__ ) . '/core/theme-updater/loader.php';
 
 add_action( 'after_setup_theme', function() {
     ShopkeeperExtender::init();

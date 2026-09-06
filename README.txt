@@ -3,7 +3,7 @@ Contributors: getbowtied
 Tags: shopkeeper, woocommerce, theme
 Requires at least: 6.0
 Tested up to: 7.1
-Stable tag: 10.0.5
+Stable tag: 10.0.6
 Requires PHP: 7.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -146,6 +146,8 @@ Start your journey to success today and elevate your online store to the next le
 
 == Changelog ==
 
+= 10.0.6 =
+* Newer updater always wins via versioned loader and GBT_Extender_Theme_Updater_Core; detach legacy direct-require hooks
 = 10.0.5 =
 - Detect current themes via GBT_Theme_Update_Notice; use marker files only on front/cron when the dashboard is not loaded
 
