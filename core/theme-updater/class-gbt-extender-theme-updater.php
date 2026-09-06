@@ -15,7 +15,8 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 
 		/**
 		 * Marker file relative to the parent theme root.
-		 * Present on current GetBowtied themes that own update notices.
+		 * Present on current GetBowtied themes; alone does not mean “theme owns updates”
+		 * if legacy class-theme-updates.php is still shipped (see theme_has_builtin_updater).
 		 */
 		const THEME_UPDATER_MARKER = 'dashboard/inc/classes/class-theme-update-notice.php';
 
@@ -50,7 +51,18 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 		);
 
 		public static function init(): void {
-			add_action( 'after_setup_theme', array( __CLASS__, 'maybe_register' ), 20 );
+			/*
+			 * This file is often loaded from ShopkeeperExtender during after_setup_theme.
+			 * Re-hooking after_setup_theme can miss the current run — register immediately
+			 * when that hook has already started, and always reinforce on init.
+			 */
+			if ( did_action( 'after_setup_theme' ) ) {
+				self::maybe_register();
+			} else {
+				add_action( 'after_setup_theme', array( __CLASS__, 'maybe_register' ), 20 );
+			}
+
+			add_action( 'init', array( __CLASS__, 'maybe_register' ), 0 );
 		}
 
 		public static function maybe_register(): void {
@@ -66,25 +78,44 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 			}
 
 			if ( self::$fallback_registered ) {
+				// Theme may register GBT_Theme_Updates hooks later on the same init.
+				self::suppress_legacy_update_notices();
 				return;
 			}
 
 			self::$fallback_registered = true;
 
 			add_filter( 'site_transient_update_themes', array( __CLASS__, 'inject_update' ), 9999 );
+			// Drop legacy license gating so it cannot re-block after we inject.
+			add_filter( 'site_transient_update_themes', array( __CLASS__, 'suppress_legacy_update_notices' ), 1000 );
+			add_filter( 'upgrader_pre_download', array( __CLASS__, 'suppress_legacy_update_notices' ), 0 );
 
 			if ( is_admin() ) {
-				add_action( 'admin_notices', array( __CLASS__, 'suppress_legacy_update_notices' ), 0 );
-				add_action( 'admin_notices', array( __CLASS__, 'render_admin_notice' ) );
-				add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_notice_assets' ) );
+				// Legacy GBT_Theme_Updates registers its notice on init (default 10).
+				add_action( 'init', array( __CLASS__, 'suppress_legacy_update_notices' ), 100 );
+				add_action( 'admin_init', array( __CLASS__, 'suppress_legacy_update_notices' ), 0 );
+				add_action( 'admin_notices', array( __CLASS__, 'suppress_legacy_update_notices' ), -999 );
+				add_action( 'admin_notices', array( __CLASS__, 'render_admin_notice' ), 1 );
+				add_action( 'admin_enqueue_scripts', array( __CLASS__, 'suppress_legacy_update_notices' ), 0 );
+				add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_notice_assets' ), 1 );
 				add_action( 'wp_ajax_' . self::NOTIFICATION_AJAX_ACTION, array( __CLASS__, 'ajax_dismiss_notice' ) );
 				add_action( 'wp_ajax_' . self::AUTO_UPDATE_AJAX_ACTION, array( __CLASS__, 'ajax_enable_auto_updates' ) );
+
+				// If init already ran (or theme already hooked), strip immediately.
+				self::suppress_legacy_update_notices();
 			}
 		}
 
 		/**
-		 * True when the active parent theme includes the built-in updater file.
-		 * File check only — never loads or calls theme classes (safe on any version).
+		 * True when the active parent theme should own updates without the extender.
+		 *
+		 * The marker file alone is not enough: some 8.x installs ship
+		 * class-theme-update-notice.php while still running license-gated
+		 * GBT_Theme_Updates (blocked://). Those must be treated as old themes.
+		 *
+		 * - No marker → old → extender owns
+		 * - Marker + legacy class-theme-updates.php → transitional → extender owns
+		 * - Marker without legacy file → current → theme owns
 		 */
 		private static function theme_has_builtin_updater(): bool {
 			if ( ! function_exists( 'get_template_directory' ) ) {
@@ -97,9 +128,21 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 				return false;
 			}
 
-			$marker = trailingslashit( $theme_dir ) . self::THEME_UPDATER_MARKER;
+			$base   = trailingslashit( $theme_dir );
+			$marker = $base . self::THEME_UPDATER_MARKER;
 
-			return file_exists( $marker );
+			if ( ! file_exists( $marker ) ) {
+				return false;
+			}
+
+			$legacy = $base . 'dashboard/inc/classes/class-theme-updates.php';
+
+			// Marker + legacy updater file = still on the license-gated path.
+			if ( file_exists( $legacy ) ) {
+				return false;
+			}
+
+			return true;
 		}
 
 		/**
@@ -122,19 +165,6 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 				return $transient;
 			}
 
-			// Leave real packages alone (Freemius / another handler).
-			// Replace legacy dashboard blocked:// entries so the free zip can install.
-			if ( isset( $transient->response[ $slug ] ) ) {
-				$existing = $transient->response[ $slug ];
-				$package  = ( is_array( $existing ) && isset( $existing['package'] ) )
-					? (string) $existing['package']
-					: '';
-
-				if ( ! self::is_blocked_package( $package ) ) {
-					return $transient;
-				}
-			}
-
 			$update = self::build_update( $slug );
 
 			if ( ! $update ) {
@@ -145,52 +175,95 @@ if ( ! class_exists( 'GBT_Extender_Theme_Updater' ) ) {
 				$transient->response = array();
 			}
 
+			// Old themes only (no marker): always own this slug's update entry —
+			// overwrite blocked:// and license-gated packages from GBT_Theme_Updates.
 			$transient->response[ $slug ] = $update;
 
 			return $transient;
 		}
 
 		/**
-		 * Older dashboards (GBT_Theme_Updates) show a license/support-restricted notice.
-		 * When this fallback owns updates, remove that notice so only the plugin notice remains.
+		 * Older dashboards show license/support-restricted update notices and
+		 * license-subscription nags. When this fallback owns updates, strip those
+		 * hooks so only the plugin update notice remains.
+		 * Safe as an action or filter callback; always returns $value unchanged for filters.
+		 *
+		 * @param mixed $value Filter value (passed through).
+		 * @return mixed
 		 */
-		public static function suppress_legacy_update_notices(): void {
+		public static function suppress_legacy_update_notices( $value = null ) {
 			if ( self::theme_has_builtin_updater() ) {
-				return;
+				return $value;
 			}
 
-			if ( ! class_exists( 'GBT_Theme_Updates', false ) ) {
-				return;
+			$hooks = array(
+				'admin_notices',
+				'all_admin_notices',
+				'admin_enqueue_scripts',
+				'site_transient_update_themes',
+				'upgrader_pre_download',
+			);
+
+			foreach ( $hooks as $hook ) {
+				self::remove_legacy_theme_callbacks( $hook );
 			}
 
+			return $value;
+		}
+
+		/**
+		 * Hard-remove legacy theme dashboard callbacks from a hook (direct unset).
+		 * Only runs when the extender owns updates (old / transitional themes).
+		 */
+		private static function remove_legacy_theme_callbacks( string $hook ): void {
 			global $wp_filter;
 
-			if ( empty( $wp_filter['admin_notices'] ) || ! ( $wp_filter['admin_notices'] instanceof WP_Hook ) ) {
+			if ( empty( $wp_filter[ $hook ] ) || ! ( $wp_filter[ $hook ] instanceof WP_Hook ) ) {
 				return;
 			}
 
-			foreach ( $wp_filter['admin_notices']->callbacks as $priority => $callbacks ) {
-				foreach ( $callbacks as $callback ) {
-					$fn = $callback['function'];
+			$legacy = array(
+				'GBT_Theme_Updates'                  => array(
+					'show_update_notice',
+					'enqueue_dismissal_script',
+					'filter_theme_transient',
+					'block_theme_download',
+					'filter_update_result',
+				),
+				'GBT_License_Subscription_Checker'   => array(
+					'check_license_and_display_notification',
+					'enqueue_dismissal_script',
+				),
+			);
 
-					if (
-						is_array( $fn )
-						&& isset( $fn[0], $fn[1] )
-						&& is_object( $fn[0] )
-						&& $fn[0] instanceof GBT_Theme_Updates
-						&& 'show_update_notice' === $fn[1]
-					) {
-						remove_action( 'admin_notices', $fn, (int) $priority );
+			foreach ( $wp_filter[ $hook ]->callbacks as $priority => $callbacks ) {
+				foreach ( $callbacks as $id => $callback ) {
+					$fn = $callback['function'] ?? null;
+
+					if ( ! is_array( $fn ) || ! isset( $fn[0], $fn[1] ) || ! is_object( $fn[0] ) ) {
+						continue;
 					}
+
+					$class = get_class( $fn[0] );
+
+					if ( ! isset( $legacy[ $class ] ) ) {
+						continue;
+					}
+
+					if ( ! in_array( $fn[1], $legacy[ $class ], true ) ) {
+						continue;
+					}
+
+					// Unset in place — leave empty priority buckets so in-flight WP_Hook
+					// iterations do not hit a missing priority key.
+					unset( $wp_filter[ $hook ]->callbacks[ $priority ][ $id ] );
 				}
 			}
 		}
 
-		private static function is_blocked_package( string $package ): bool {
-			return strpos( $package, 'blocked://' ) === 0;
-		}
-
 		public static function render_admin_notice(): void {
+			self::suppress_legacy_update_notices();
+
 			if ( ! current_user_can( 'update_themes' ) ) {
 				return;
 			}
